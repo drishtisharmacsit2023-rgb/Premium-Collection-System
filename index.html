@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PremiumCollect – Insurance Premium Collection & Payment Tracking</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--g:#059669;--gd:#047857;--lg:#D1FAE5;--bg:#f3faf6;--card:#fff;--tx:#0f2a21;--mut:#5b7268;--bd:#d9eae1;--red:#dc2626;--amb:#b45309}
+[data-theme=dark]{--bg:#0c1a15;--card:#12261e;--tx:#e6f4ee;--mut:#8fb3a3;--bd:#1f3a2f;--lg:#143a2c}
+*{box-sizing:border-box;margin:0}
+body{font-family:Manrope,system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--g);outline-offset:2px}
+#login{min-height:100vh;display:grid;place-items:center;padding:16px}
+.lbox{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:32px;width:100%;max-width:400px}
+.lbox h1{font-size:26px;font-weight:800;color:var(--gd)}.lbox p{color:var(--mut);margin:4px 0 18px}
+#app{display:none;min-height:100vh}
+aside{position:fixed;inset:0 auto 0 0;width:220px;background:var(--gd);color:#fff;padding:18px 12px;display:flex;flex-direction:column;gap:2px;z-index:20;transition:transform .2s}
+aside .brand{font-weight:800;font-size:19px;padding:4px 10px 16px}
+aside .brand span{color:var(--lg)}
+aside a{display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:9px;color:#d7f5e6;cursor:pointer;text-decoration:none;border:0;background:none;text-align:left;width:100%}
+aside a:hover{background:rgba(255,255,255,.1)}aside a.on{background:#fff;color:var(--gd);font-weight:700}
+.top{position:sticky;top:0;z-index:10;margin-left:220px;background:var(--card);border-bottom:1px solid var(--bd);padding:10px 24px;display:flex;align-items:center;gap:12px}
+.top .sp{flex:1}.burger{display:none}
+.chip{background:var(--lg);color:var(--gd);border-radius:99px;padding:3px 12px;font-weight:700;font-size:12px}
+main{margin-left:220px;padding:24px;max-width:1200px}
+h2{font-size:22px;font-weight:800;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--bd);border-left:4px solid var(--g);border-radius:12px;padding:14px 16px}
+.stat small{color:var(--mut)}.stat b{display:block;font-size:24px;font-weight:800}
+.stat.bad{border-left-color:var(--red)}
+.cols{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.bars{display:flex;align-items:flex-end;gap:10px;height:150px}
+.bars div{flex:1;text-align:center;font-size:11px;color:var(--mut);display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.bars i{display:block;background:var(--g);border-radius:5px 5px 0 0;min-height:2px}
+.hb{margin:8px 0;font-size:13px}.hb i{display:block;height:8px;background:var(--g);border-radius:4px;margin-top:2px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--g);color:#fff;text-align:left;padding:9px 12px;font-weight:700;white-space:nowrap}
+th:first-child{border-radius:8px 0 0 0}th:last-child{border-radius:0 8px 0 0}
+td{padding:9px 12px;border-bottom:1px solid var(--bd);white-space:nowrap}
+tbody tr:nth-child(even){background:var(--lg)}[data-theme=dark] tbody tr:nth-child(even){background:#0f2219}
+.b{border-radius:99px;padding:2px 10px;font-size:12px;font-weight:700}
+.Paid,.Reconciled,.Matched{background:#d1fae5;color:#065f46}.Pending,.Unreconciled,.Partial{background:#fef3c7;color:#92400e}
+.Overdue,.Failed,.Discrepancy{background:#fee2e2;color:#991b1b}
+.btn{background:var(--g);color:#fff;border:0;border-radius:8px;padding:8px 16px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--gd)}.btn.o{background:none;color:var(--g);border:1px solid var(--g)}.btn.s{padding:4px 10px;font-size:12px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+label{display:block;font-weight:700;font-size:12px;margin-bottom:12px;color:var(--mut)}
+label input,label select{display:block;width:100%;margin-top:4px;padding:9px 11px;border:1px solid var(--bd);border-radius:8px;background:var(--card);font-weight:500}
+label.chk{display:flex;gap:8px;align-items:center}label.chk input{width:auto;margin:0}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0 16px}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.bar input,.bar select{padding:8px 11px;border:1px solid var(--bd);border-radius:8px;background:var(--card)}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;place-items:center;z-index:50;padding:16px}
+#modal .in{background:var(--card);border-radius:14px;padding:24px;max-width:520px;width:100%;max-height:90vh;overflow:auto}
+.rcpt{border:2px dashed var(--g);border-radius:10px;padding:18px}.rcpt h3{color:var(--gd)}
+.rcpt dl{display:grid;grid-template-columns:130px 1fr;gap:6px;margin:12px 0}.rcpt dt{color:var(--mut)}
+#toast{position:fixed;bottom:20px;right:20px;background:var(--gd);color:#fff;padding:11px 18px;border-radius:10px;display:none;z-index:60}
+@media(max-width:860px){aside{transform:translateX(-100%)}aside.open{transform:none}.top,main{margin-left:0}.burger{display:inline-block}.cols{grid-template-columns:1fr}main{padding:14px}}
+@media print{body *{visibility:hidden}.rcpt,.rcpt *{visibility:visible}.rcpt{position:fixed;inset:20px}}
+</style>
+</head>
+<body>
+<section id="login"><div class="lbox">
+<h1>PremiumCollect</h1><p id="lsub">Sign in to manage premium collections.</p>
+<div id="rname" style="display:none"><label>Full name<input id="n"></label></div>
+<label>Email<input id="e" type="email" value="admin@demo.com"></label>
+<label>Password<input id="p" type="password" value="admin123"></label>
+<div id="rrole" style="display:none"><label>Role<select id="r"><option>Admin</option><option>Cashier</option><option>Agent</option></select></label></div>
+<button class="btn" style="width:100%" onclick="auth()" id="lbtn">Sign in</button>
+<p style="margin:14px 0 0;font-size:13px"><a href="#" onclick="tog();return false" id="lt" style="color:var(--g);font-weight:700">Create an account</a></p>
+<p style="font-size:12px">Demo: admin@demo.com / admin123 · cashier@demo.com / cash123 · agent@demo.com / agent123</p>
+</div></section>
+
+<div id="app">
+<aside id="side"><div class="brand">Premium<span>Collect</span></div><nav id="nav"></nav></aside>
+<header class="top"><button class="btn o s burger" onclick="side.classList.toggle('open')" aria-label="Menu">☰</button>
+<b id="ttl"></b><span class="sp"></span><span class="chip" id="who"></span>
+<button class="btn o s" onclick="theme()">🌓 Dark mode</button><button class="btn s" onclick="logout()">Logout</button></header>
+<main id="main"></main>
+</div>
+<div id="modal"><div class="in" id="mbody"></div></div><div id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
+const iso=d=>d.toISOString().slice(0,10),TODAY=iso(new Date());
+const addM=(s,m)=>{const d=new Date(s);d.setMonth(d.getMonth()+m);return iso(d)};
+const addD=n=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)};
+const METHODS=['Credit Card','Bank Transfer','UPI','Cash','Cheque','Mobile Wallet'];
+const FREQ={'Monthly':[12,1],'Quarterly':[4,3],'Half-Yearly':[2,6],'Yearly':[1,12],'Single Premium':[1,12]};
+const MI={'Credit Card':'💳','Bank Transfer':'🏦','UPI':'📱','Cash':'💵','Cheque':'📝','Mobile Wallet':'👛'};
+const PAGES=[['dashboard','📊','Dashboard',['Admin','Cashier','Agent']],['holders','👥','Policy Holders',['Admin','Agent']],['pay','💰','Premium Payment',['Admin','Cashier']],['inst','🗓️','Installments',['Admin','Cashier','Agent']],['dues','⏰','Due Dates',['Admin','Cashier','Agent']],['hist','🧾','Payment History',['Admin','Cashier']],['recon','⚖️','Reconciliation',['Admin']],['rep','📈','Reports',['Admin','Agent']]];
+
+/* ---------- data layer (arrays/objects, saved in localStorage) ---------- */
+let DB,ctx={};
+function save(){try{localStorage.setItem('pc_db',JSON.stringify(DB))}catch(e){}}
+function mkInst(h){const [n,s]=FREQ[h.freq];return Array.from({length:n},(_,i)=>({id:h.id+'-'+(i+1),hid:h.id,no:i+1,due:addM(h.start,i*s),amount:h.premium,paid:0}))}
+function seed(){
+ const raw=[['Anita Sharma','98100 11122','LIC-JW-10231','Jeevan Anand',2500,'Monthly',-130],['Rahul Verma','98765 43210','LIC-TM-20984','Tech Term',6000,'Quarterly',-200],['Meera Iyer','99887 76655','LIC-EP-30412','Endowment Plus',18000,'Half-Yearly',-210],['Suresh Patil','90909 80808','LIC-JU-40177','Jeevan Umang',42000,'Yearly',-20],['Kavita Joshi','97000 12345','LIC-SP-50620','Single Premium Plan',150000,'Single Premium',-5],['Imran Khan','95555 22334','LIC-JL-60731','Jeevan Labh',3200,'Monthly',-95],['Divya Nair','96666 77889','LIC-NM-70845','New Money Back',9500,'Quarterly',-250],['Arjun Mehta','94444 55667','LIC-JS-80956','Jeevan Shanti',22000,'Half-Yearly',-100]];
+ DB={users:[{name:'Admin User',email:'admin@demo.com',pw:'admin123',role:'Admin'},{name:'Cash Counter',email:'cashier@demo.com',pw:'cash123',role:'Cashier'},{name:'Field Agent',email:'agent@demo.com',pw:'agent123',role:'Agent'}],holders:[],insts:[],pays:[],rc:1000,hc:8,log:[],session:null,dark:false};
+ raw.forEach((r,i)=>{const h={id:'H'+(i+1),name:r[0],phone:r[1],policy:r[2],plan:r[3],premium:r[4],freq:r[5],start:addD(r[6])};DB.holders.push(h);DB.insts.push(...mkInst(h))});
+ DB.insts.forEach((x,i)=>{if(x.due<addD(-40)){x.paid=x.amount;const m=METHODS[i%6];DB.pays.push({id:++DB.rc,rcpt:'RCP-'+DB.rc,iid:x.id,hid:x.hid,amount:x.amount,method:m,date:x.due,status:'Paid',bank:i===3?x.amount-50:x.amount,recon:i%4!==0&&i!==3,by:'Cash Counter'})}});
+}
+try{DB=JSON.parse(localStorage.getItem('pc_db'))}catch(e){}
+if(!DB||!DB.holders)seed();
+const H=id=>DB.holders.find(h=>h.id===id)||{name:'?',policy:'?'};
+const stat=x=>x.paid>=x.amount?'Paid':x.paid>0?(x.due<TODAY?'Overdue':'Partial'):x.due<TODAY?'Overdue':'Pending';
+const bd=s=>`<span class="b ${s}">${s}</span>`;
+const sum=a=>a.reduce((t,x)=>t+x,0);
+const okPays=()=>DB.pays.filter(p=>p.status!=='Failed');
+
+/* ---------- auth ---------- */
+let reg=false;
+function tog(){reg=!reg;['rname','rrole'].forEach(i=>$('#'+i).style.display=reg?'block':'none');$('#lbtn').textContent=reg?'Create account':'Sign in';$('#lt').textContent=reg?'I already have an account':'Create an account';$('#e').value=$('#p').value=''}
+function auth(){const e=$('#e').value.trim().toLowerCase(),p=$('#p').value;
+ if(!e||!p)return toast('Enter email and password.');
+ if(reg){if(!$('#n').value.trim()||p.length<6)return toast('Add your name and a password of 6+ characters.');
+  if(DB.users.some(u=>u.email===e))return toast('That email is already registered.');
+  DB.users.push({name:$('#n').value.trim(),email:e,pw:p,role:$('#r').value});save();toast('Account created. Sign in now.');return tog()}
+ const u=DB.users.find(u=>u.email===e&&u.pw===p);if(!u)return toast('Email or password is incorrect.');
+ DB.session=u.email;save();start()}
+function logout(){DB.session=null;save();$('#app').style.display='none';$('#login').style.display='grid'}
+const me=()=>DB.users.find(u=>u.email===DB.session);
+function start(){const u=me();if(!u)return;$('#login').style.display='none';$('#app').style.display='block';
+ document.documentElement.dataset.theme=DB.dark?'dark':'';$('#who').textContent=u.name+' · '+u.role;
+ $('#nav').innerHTML=PAGES.filter(p=>p[3].includes(u.role)).map(p=>`<a id="n-${p[0]}" onclick="go('${p[0]}')">${p[1]} ${p[2]}</a>`).join('');go('dashboard')}
+function theme(){DB.dark=!DB.dark;document.documentElement.dataset.theme=DB.dark?'dark':'';save()}
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t.t);t.t=setTimeout(()=>t.style.display='none',2800)}
+function modal(h){$('#mbody').innerHTML=h;$('#modal').style.display='grid'}
+function closeM(){$('#modal').style.display='none'}
+$('#modal').onclick=e=>{if(e.target.id==='modal')closeM()};
+function csv(name,head,rows){const q=v=>'"'+String(v).replace(/"/g,'""')+'"';const t=[head,...rows].map(r=>r.map(q).join(',')).join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=name+'.csv';a.click()}
+const table=(head,rows)=>rows.length?`<div class="tw"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--mut)">Nothing to show yet.</p>';
+
+/* ---------- router ---------- */
+function go(p,c){ctx=c||{};side.classList.remove('open');const pg=PAGES.find(x=>x[0]===p);
+ if(!pg[3].includes(me().role))return toast('Your role cannot open this page.');
+ document.querySelectorAll('aside a').forEach(a=>a.classList.toggle('on',a.id==='n-'+p));
+ $('#ttl').textContent=pg[2];$('#main').innerHTML=V[p]();if(A[p])A[p]()}
+const V={},A={};
+
+/* Dashboard */
+V.dashboard=()=>{const ok=okPays(),mo=TODAY.slice(0,7);
+ const today=sum(ok.filter(p=>p.date===TODAY).map(p=>p.amount)),month=sum(ok.filter(p=>p.date.startsWith(mo)).map(p=>p.amount));
+ const open=DB.insts.filter(x=>x.paid<x.amount),pend=sum(open.map(x=>x.amount-x.paid)),over=open.filter(x=>x.due<TODAY);
+ const days=[...Array(7)].map((_,i)=>{const d=addD(i-6);return[d.slice(5),sum(ok.filter(p=>p.date===d).map(p=>p.amount))]});
+ const mx=Math.max(...days.map(d=>d[1]),1),bm=METHODS.map(m=>[m,sum(ok.filter(p=>p.method===m).map(p=>p.amount))]),mm=Math.max(...bm.map(b=>b[1]),1);
+ return `<div class="stats"><div class="stat"><small>Collected today</small><b>${fmt(today)}</b></div><div class="stat"><small>Collected this month</small><b>${fmt(month)}</b></div>
+ <div class="stat"><small>Pending dues</small><b>${fmt(pend)}</b></div><div class="stat bad"><small>Overdue installments</small><b>${over.length}</b></div></div>
+ <div class="cols"><div class="card"><h3>Daily collections · last 7 days</h3><br><div class="bars">${days.map(d=>`<div title="${fmt(d[1])}"><i style="height:${d[1]/mx*100}%"></i>${d[0]}</div>`).join('')}</div></div>
+ <div class="card"><h3>By payment method</h3>${bm.map(b=>`<div class="hb">${MI[b[0]]} ${b[0]} <b style="float:right">${fmt(b[1])}</b><i style="width:${b[1]/mm*100}%"></i></div>`).join('')}</div></div>
+ <div class="card"><h3>Recent payments</h3><br>${table(['Receipt','Policy holder','Amount','Method','Date','Status'],[...DB.pays].reverse().slice(0,6).map(p=>[p.rcpt,esc(H(p.hid).name),fmt(p.amount),MI[p.method]+' '+p.method,p.date,bd(p.status)]))}</div>`};
+
+/* Policy holders */
+const hRows=q=>DB.holders.filter(h=>(h.name+h.policy+h.phone).toLowerCase().includes(q.toLowerCase())).map(h=>{
+ const i=DB.insts.filter(x=>x.hid===h.id),due=sum(i.map(x=>x.amount-x.paid));return[esc(h.name),h.policy,esc(h.plan),fmt(h.premium)+' / '+h.freq,fmt(due),`<button class="btn s o" onclick="viewH('${h.id}')">View</button>`]});
+V.holders=()=>`<div class="bar"><input id="q" placeholder="Search name, policy or phone" oninput="$('#ht').innerHTML=table(['Name','Policy no.','Plan','Premium','Outstanding',''],hRows(this.value))"><button class="btn" onclick="addH()">+ Add policy holder</button></div><div class="card" id="ht">${table(['Name','Policy no.','Plan','Premium','Outstanding',''],hRows(''))}</div>`;
+function viewH(id){const h=H(id),i=DB.insts.filter(x=>x.hid===id),p=DB.pays.filter(x=>x.hid===id);
+ modal(`<h2>${esc(h.name)}</h2><p>${h.policy} · ${esc(h.plan)} · ${esc(h.phone)}</p><br><h3>Installments</h3>${table(['#','Due','Amount','Paid','Status'],i.map(x=>[x.no,x.due,fmt(x.amount),fmt(x.paid),bd(stat(x))]))}<br><h3>Payment history</h3>${table(['Receipt','Date','Amount','Method'],p.map(x=>[x.rcpt,x.date,fmt(x.amount),x.method]))}<br><button class="btn o" onclick="closeM()">Close</button>`)}
+function addH(){modal(`<h2>Add policy holder</h2><div class="g2"><label>Name<input id="a1"></label><label>Phone<input id="a2"></label><label>Plan name<input id="a3"></label><label>Premium per installment (₹)<input id="a4" type="number" min="1"></label><label>Frequency<select id="a5">${Object.keys(FREQ).map(f=>`<option>${f}</option>`)}</select></label><label>Start date<input id="a6" type="date" value="${TODAY}"></label></div><button class="btn" onclick="saveH()">Save policy holder</button> <button class="btn o" onclick="closeM()">Cancel</button>`)}
+function saveH(){const v=i=>$('#a'+i).value.trim();if(!v(1)||!v(3)||!(+v(4)>0)||!v(6))return toast('Fill in name, plan, premium and start date.');
+ const id='H'+(++DB.hc),h={id,name:v(1),phone:v(2)||'-',policy:'LIC-NEW-'+(10000+DB.hc*7),plan:v(3),premium:+v(4),freq:v(5),start:v(6)};
+ DB.holders.push(h);DB.insts.push(...mkInst(h));save();closeM();toast('Policy holder added.');go('holders')}
+
+/* Premium payment */
+V.pay=()=>`<div class="card" style="max-width:640px"><div class="g2"><label>Policy holder<select id="ph" onchange="fillI()">${DB.holders.map(h=>`<option value="${h.id}">${esc(h.name)} · ${h.policy}</option>`)}</select></label>
+<label>Installment<select id="pi" onchange="fillA()"></select></label><label>Amount (₹)<input id="pa" type="number" min="1"></label>
+<label>Payment method<select id="pm">${METHODS.map(m=>`<option>${m}</option>`)}</select></label></div>
+<label class="chk"><input type="checkbox" id="pf"> Record as a failed attempt (no money received)</label><button class="btn" onclick="doPay()">Collect premium &amp; generate receipt</button></div>`;
+A.pay=()=>{if(ctx.iid){const x=DB.insts.find(i=>i.id===ctx.iid);$('#ph').value=x.hid}fillI(ctx.iid)};
+function fillI(sel){const o=DB.insts.filter(x=>x.hid===$('#ph').value&&x.paid<x.amount);
+ $('#pi').innerHTML=o.length?o.map(x=>`<option value="${x.id}">#${x.no} · due ${x.due} · ${stat(x)}</option>`).join(''):'<option value="">All installments paid</option>';if(sel)$('#pi').value=sel;fillA()}
+function fillA(){const x=DB.insts.find(i=>i.id===$('#pi').value);$('#pa').value=x?x.amount-x.paid:''}
+function doPay(){const x=DB.insts.find(i=>i.id===$('#pi').value),a=+$('#pa').value;
+ if(!x)return toast('Pick an installment that still has a balance.');
+ if(!(a>0)||a>x.amount-x.paid)return toast('Amount must be between ₹1 and the balance of '+fmt(x.amount-x.paid)+'.');
+ const failed=$('#pf').checked,m=$('#pm').value,rem=x.amount-x.paid;
+ const p={id:++DB.rc,rcpt:'RCP-'+DB.rc,iid:x.id,hid:x.hid,amount:a,method:m,date:TODAY,status:failed?'Failed':a>=rem?'Paid':'Partial',bank:null,recon:false,by:me().name};
+ if(!failed)x.paid+=a;DB.pays.push(p);save();
+ if(failed){toast('Failed attempt recorded. Installment unchanged.');go('pay')}else{toast('Payment collected.');receipt(p.id,true)}}
+function receipt(id,fromPay){const p=DB.pays.find(x=>x.id===id),h=H(p.hid),x=DB.insts.find(i=>i.id===p.iid);
+ modal(`<div class="rcpt"><h3>PremiumCollect · Payment receipt</h3><dl><dt>Receipt no.</dt><dd>${p.rcpt}</dd><dt>Date</dt><dd>${p.date}</dd><dt>Policy holder</dt><dd>${esc(h.name)}</dd><dt>Policy no.</dt><dd>${h.policy}</dd><dt>Installment</dt><dd>#${x.no} (due ${x.due})</dd><dt>Method</dt><dd>${p.method}</dd><dt>Amount received</dt><dd><b>${fmt(p.amount)}</b></dd><dt>Status</dt><dd>${p.status}</dd><dt>Collected by</dt><dd>${esc(p.by)}</dd></dl><small>This is a computer-generated receipt.</small></div><br><button class="btn" onclick="window.print()">Print receipt</button> <button class="btn o" onclick="closeM();${fromPay?"go('pay')":''}">Close</button>`)}
+
+/* Installments */
+V.inst=()=>`<div class="bar"><select id="fs" onchange="$('#it').innerHTML=iT()"><option value="">All statuses</option><option>Pending</option><option>Partial</option><option>Overdue</option><option>Paid</option></select></div><div class="card" id="it">${iT()}</div>`;
+function iT(){const f=$('#fs')?$('#fs').value:'',can=me().role!=='Agent';
+ return table(['Policy holder','Installment','Due date','Amount','Paid','Status',''],DB.insts.filter(x=>!f||stat(x)===f).sort((a,b)=>a.due<b.due?-1:1).map(x=>[esc(H(x.hid).name),'#'+x.no,x.due,fmt(x.amount),fmt(x.paid),bd(stat(x)),x.paid<x.amount&&can?`<button class="btn s" onclick="go('pay',{iid:'${x.id}'})">Collect</button>`:'']))}
+
+/* Due dates */
+V.dues=()=>{const open=DB.insts.filter(x=>x.paid<x.amount),GR=7;
+ const rows=open.filter(x=>x.due<=addD(30)).sort((a,b)=>a.due<b.due?-1:1).map(x=>{const late=Math.round((new Date(TODAY)-new Date(x.due))/864e5),g=late>0?(late<=GR?'In grace period':'Grace ended'):'Upcoming';
+  return[esc(H(x.hid).name),x.due,fmt(x.amount-x.paid),late>0?late+' days late':(-late)+' days left',g,`<button class="btn s o" onclick="remind('${x.id}')">Send reminder</button>`]});
+ return `<p style="color:var(--mut);margin-bottom:12px">Dues falling within the next 30 days, plus everything overdue. Grace period: ${GR} days after the due date.</p><div class="card">${table(['Policy holder','Due date','Balance','Timing','Grace period','Reminder'],rows)}</div>
+ <div class="card"><h3>Reminder log (simulated)</h3><br>${DB.log.length?DB.log.slice(-5).reverse().map(l=>`<p>✉️ ${l}</p>`).join(''):'<p style="color:var(--mut)">No reminders sent yet.</p>'}</div>`};
+function remind(id){const x=DB.insts.find(i=>i.id===id),h=H(x.hid);DB.log.push(`${TODAY}: reminder for installment #${x.no} sent to ${esc(h.name)} (${esc(h.phone)})`);save();toast('Reminder sent to '+h.name+' (simulated).');go('dues')}
+
+/* History */
+V.hist=()=>`<div class="bar"><input id="hq" placeholder="Search policy holder or receipt" oninput="$('#hh').innerHTML=hT(this.value)"></div><div class="card" id="hh">${hT('')}</div>`;
+function hT(q){return table(['Receipt','Date','Policy holder','Amount','Method','Status',''],[...DB.pays].reverse().filter(p=>(p.rcpt+H(p.hid).name).toLowerCase().includes(q.toLowerCase())).map(p=>[p.rcpt,p.date,esc(H(p.hid).name),fmt(p.amount),MI[p.method]+' '+p.method,bd(p.status),p.status!=='Failed'?`<button class="btn s o" onclick="receipt(${p.id})">Receipt</button>`:'']))}
+
+/* Reconciliation */
+const rs=p=>p.recon?'Reconciled':(p.bank!=null&&p.bank!==p.amount)?'Discrepancy':'Unreconciled';
+V.recon=()=>{const o=okPays(),d=o.filter(p=>rs(p)==='Discrepancy');
+ return `<div class="stats"><div class="stat"><small>Reconciled</small><b>${o.filter(p=>p.recon).length}</b></div><div class="stat"><small>Unreconciled</small><b>${o.filter(p=>rs(p)==='Unreconciled').length}</b></div><div class="stat bad"><small>Discrepancies</small><b>${d.length}</b></div></div>
+ <div class="card"><p style="color:var(--mut);margin-bottom:10px">Enter the amount seen on the bank or cash statement. Matching entries can be reconciled; mismatches are flagged.</p>
+ ${table(['Receipt','Date','Recorded','Bank amount','Status',''],o.map(p=>[p.rcpt,p.date,fmt(p.amount),`<input type="number" value="${p.bank??''}" style="width:110px;padding:4px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--card)" onchange="setB(${p.id},this.value)">`,bd(rs(p)),p.recon?'':`<button class="btn s" ${p.bank===p.amount?'':'disabled'} onclick="doRec(${p.id})">Reconcile</button>`]))}</div>`};
+function setB(id,v){const p=DB.pays.find(x=>x.id===id);p.bank=v===''?null:+v;p.recon=false;save();go('recon')}
+function doRec(id){DB.pays.find(x=>x.id===id).recon=true;save();toast('Marked as reconciled.');go('recon')}
+
+/* Reports */
+const RP={
+ 'Premium collection':[['Receipt','Date','Policy holder','Method','Amount'],()=>okPays().map(p=>[p.rcpt,p.date,H(p.hid).name,p.method,p.amount])],
+ 'Due report':[['Policy holder','Policy no.','Installment','Due date','Balance','Status'],()=>DB.insts.filter(x=>x.paid<x.amount).map(x=>[H(x.hid).name,H(x.hid).policy,'#'+x.no,x.due,x.amount-x.paid,stat(x)])],
+ 'Reconciliation report':[['Receipt','Recorded','Bank amount','Difference','Status'],()=>okPays().map(p=>[p.rcpt,p.amount,p.bank??'',p.bank==null?'':p.bank-p.amount,rs(p)])]};
+V.rep=()=>`<div class="bar"><select id="rt" onchange="rT()">${Object.keys(RP).map(k=>`<option>${k}</option>`)}</select><button class="btn" onclick="expR()">Export CSV</button></div><div class="card" id="rb"></div>`;
+A.rep=()=>rT();
+function rT(){const[h,f]=RP[$('#rt').value],r=f();$('#rb').innerHTML=table(h,r.map(x=>x.map(c=>typeof c==='number'&&!/^#/.test(c)?fmt(c):esc(c))))}
+function expR(){const k=$('#rt').value;csv(k.replace(/ /g,'_'),RP[k][0],RP[k][1]())}
+
+if(me())start();
+</script>
+</body>
+</html>
